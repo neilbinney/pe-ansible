@@ -1,0 +1,9 @@
+---
+ - name:  Create Dummy id-control_repo.rsa for 2017.2
+   file:
+     path: "/etc/puppetlabs/puppetserver/ssh/"
+     recurse: yes
+     state: directory
+ - file:
+     path: /etc/puppetlabs/puppetserver/ssh/id-control_repo.rsa
+     state: touch	

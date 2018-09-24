@@ -1,0 +1,15 @@
+[all-servers:children]
+pe-master
+agents
+
+[pe-master]
+erdbasf9d1915wx.delivery.puppetlabs.net
+
+[pe-master:children]
+slice
+
+[slice]
+
+[agents]
+c28tagunzoru4zn.delivery.puppetlabs.net
+io9cwcuek2792fq.delivery.puppetlabs.net

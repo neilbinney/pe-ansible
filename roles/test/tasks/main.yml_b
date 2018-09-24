@@ -1,0 +1,16 @@
+---
+- name: Add agents to autosign.conf
+#  lineinfile:
+#    dest: /etc/puppetlabs/puppet/autosign.conf
+#    line: "io9cwcuek2792fq.delivery.puppetlabs.net"
+#
+#
+  lineinfile:
+    dest: /etc/puppetlabs/puppet/autosign.conf
+    line: "{{ hostvars[item]['ansible_fqdn'] }}"
+#    with_items: groups['agents']
+#
+#- debug: msg="{{ hostvars[item]['ansible_fqdn'] }}" 
+#  with_items:
+#     - "{{ groups['agents'] }}"
+    loop: "{{ groups['agents'] }}"

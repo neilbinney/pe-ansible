@@ -1,0 +1,21 @@
+---
+- name: Install Puppet Agent
+  yum:
+    name: https://{{ pe_master }}:8140/packages/current/el-7-x86_64/puppet-agent-5.5.3-1.el7.x86_64.rpm
+    state: installed
+    disable_gpg_check: yes
+    validate_certs: no
+
+- name: write puppet conf
+  template:
+    src:   puppet.conf.j2 
+    dest:  /etc/puppetlabs/puppet/puppet.conf
+    owner: root
+    group: root
+    mode:  u=rwx,g=rx,o=rx
+
+- name: start_puppet
+  service: 
+    name: 'puppet.service' 
+    enabled: 'yes'
+    state: 'started'

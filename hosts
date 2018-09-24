@@ -1,0 +1,13 @@
+[all-servers:children]
+pe-master
+agents
+
+[pe-master]
+v3uoxjfx16hpacr.delivery.puppetlabs.net
+
+[pe-master:children]
+slice
+
+[slice]
+
+[agents]

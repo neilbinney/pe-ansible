@@ -1,0 +1,10 @@
+---
+#- name: Add agents to autosign.conf
+#  lineinfile:
+#    dest: /etc/puppetlabs/puppet/autosign.conf
+#    line: "io9cwcuek2792fq.delivery.puppetlabs.net"
+#
+#
+- debug:
+    msg: "{{ item }}"
+  loop: "{{ groups['agents'] }}"

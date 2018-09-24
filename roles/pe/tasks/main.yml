@@ -1,0 +1,59 @@
+---
+- name: Get PE
+  unarchive:
+    src: https://s3.amazonaws.com/pe-builds/released/{{ pe_version }}/puppet-enterprise-{{ pe_version }}-{{ pe_arch }}.tar.gz
+    dest: /tmp/
+    remote_src: yes
+    creates: /tmp/puppet-enterprise-{{ pe_version }}-{{ pe_arch }}
+
+- name: Add Git to /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    line: "{{ git_repo_ip }} {{ git_repo }}"
+
+- name: Update pe.conf admin password
+  lineinfile: 
+    dest: /tmp/puppet-enterprise-{{ pe_version }}-{{ pe_arch }}/conf.d/pe.conf
+    regexp: '^\s*"console_admin_password"'
+    line: '"console_admin_password": "{{ pe_password }}"'
+
+- name: Update pe.conf code-manager settings
+  blockinfile:
+    path: /tmp/puppet-enterprise-{{ pe_version }}-{{ pe_arch }}/conf.d/pe.conf
+    insertbefore: ^}
+    block: |
+       "puppet_enterprise::profile::master::code_manager_auto_configure": true
+       "puppet_enterprise::profile::master::r10k_remote": "git@{{ git_repo }}:puppet/control-repo.git"
+       "puppet_enterprise::profile::master::r10k_private_key": "/etc/puppetlabs/puppetserver/ssh/id-control_repo.rsa"
+
+- name:  Create Dummy id-control_repo.rsa for 2017.2
+  include_tasks: cm.yml	
+  when: pe_version is match ("2017.2.*")
+
+- name: Run PE installer
+  command: /tmp/puppet-enterprise-{{ pe_version }}-{{ pe_arch }}/puppet-enterprise-installer -c /tmp/puppet-enterprise-{{ pe_version }}-{{ pe_arch }}/conf.d/pe.conf creates=/etc/puppetlabs/enterprise
+
+- name: Add id-control_repo.rsa key
+  file:
+    owner: pe-puppet
+    group: pe-puppet
+    path: /etc/puppetlabs/puppetserver/ssh
+    state: directory
+- copy:
+    owner: pe-puppet
+    group: pe-puppet
+    dest: /etc/puppetlabs/puppetserver/ssh/id-control_repo.rsa
+    src: files/id-control_repo.rsa
+
+- name: Run puppet agent and fail if anything goes wrong
+  puppet:
+  with_sequence: count=3
+
+- name: Trigger Code Manager Deploy
+  include_tasks:  trigger_code_manager_deploy.yml
+
+- name: Add agents to /etc/puppetlabs/puppet/autosign.conf
+  lineinfile:
+   dest: /etc/puppetlabs/puppet/autosign.conf
+   line: "{{ hostvars[item]['ansible_fqdn'] }}"
+  loop: "{{ groups['agents'] }}"

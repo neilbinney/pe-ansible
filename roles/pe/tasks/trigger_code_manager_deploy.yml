@@ -1,0 +1,30 @@
+---
+ - name:  Create Access token
+   uri:
+     url: https://{{ ansible_hostname }}:4433/rbac-api/v1/auth/token
+     method: POST
+     validate_certs: no
+     body_format: json
+     body: '{"login": "admin", "password": "{{ pe_password }}", "lifetime": "180d", "label": "four-minute token"}'
+   register: login
+
+ - debug:
+    msg: "Token: {{ login }}"
+
+ - name: copy ip_json content into a file
+   copy:
+    content: "{{ login.json.token }}"
+    dest: "/tmp/token.txt"
+
+ - name: Deploy Code
+   uri:
+     url: https://{{ ansible_hostname }}:8170/code-manager/v1/deploys
+     method: POST
+     validate_certs: no
+     headers:
+       X-Authentication: "{{ login.json.token }}"
+     body_format: json
+     body: '{"deploy-all": true}'
+
+ - name: Run puppet agent and fail if anything goes wrong
+   puppet:

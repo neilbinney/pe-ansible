@@ -1,0 +1,10 @@
+---
+- name: Update Yum
+  yum: name=* state=latest
+
+- name: Install Base Packages
+  yum:
+    name:
+    - tmux
+    - wget
+    - telnet

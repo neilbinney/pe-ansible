@@ -1,0 +1,6 @@
+---
+pe_password:  test01
+pe_version: 2018.1.0
+pe_arch:  el-7-x86_64
+git_repo_ip: 10.32.166.13
+git_repo:  nbgitlab01v

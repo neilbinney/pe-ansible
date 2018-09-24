@@ -1,0 +1,11 @@
+---
+ - name:  Create Access token
+   uri:
+     url: https://{{ ansible_hostname }}:4433/rbac-api/v1/auth/token
+     method: POST
+     client_cert: /etc/puppetlabs/puppet/ssl/ca/ca_crt.pem
+     body_format: json
+     body: "login": "admin", "password": "{{ pe_password }}", "lifetime": "4m", "label": "four-minute token"
+   register: login
+
+ - debug: msg=" {{ login.content }}"

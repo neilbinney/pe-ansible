@@ -1,0 +1,14 @@
+---
+- name: Agent version
+  find:
+    paths:  /tmp
+    patterns: "*test*"
+  register: files_matched
+#
+- set_fact:
+    agent_version: "'{{ files_matched.files[0].path | regex_search('\w+(?:\.\w+)*$') }}'"
+#
+#- debug: msg="{{ files_matched.files[0].path | regex_search('\w+(?:\.\w+)*$') }}"
+#- debug: 
+#    msg="{{ item.pw_name }}"
+#  with_items: "{{ files_matched.files }}" 
